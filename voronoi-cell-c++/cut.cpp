@@ -1,11 +1,12 @@
 #include "cut.h"
 #include <iostream>
 #include <cmath>
+#include <omp.h>
 //the function of struct 
 //vert
 using namespace std;
 
-void calc_distan(double * length, double * lengthh, double * distan, double& tp){
+void calc_distan(const double * length, const double * lengthh, double * distan, double& tp){
     tp=0.0;
     for(int i=0; i<3;i++){
         if(std::abs(distan[i])> lengthh[i]) {
@@ -17,19 +18,19 @@ void calc_distan(double * length, double * lengthh, double * distan, double& tp)
 }
 
 //cross and dot product
-void crossproduct(double* a, double* b, double* c){
+void crossproduct(const double* a, const double* b, double* c){
 c[0]=a[1]*b[2]-a[2]*b[1];
 c[1]=a[2]*b[0]-a[0]*b[2];
 c[2]=a[0]*b[1]-a[1]*b[0];
 }
 
-void dotproduct(double* a, double* b, double& c, int length){
+void dotproduct(const double* a, const double* b, double& c, int length){
 c=0.0; for(int i=0; i<length; i++) c+=a[i]*b[i];
 }
 
 //volume and surface
-void volume(vector<face>& face_te, vector<flist>& flist_te, vector<vert>& vert_te, 
-int flast, double& vol, double& tot_surf, double* length, double* lengthh){
+void volume(const vector<face>& face_te, const vector<flist>& flist_te, const vector<vert>& vert_te, 
+int flast,  double& vol, double& tot_surf, const double* length, const double* lengthh){
 vol=0.0; tot_surf=0.0; double surf;
 for(int i0=0; i0<flast; i0++){
 if (face_te[i0].stat == 3) { surface(face_te[i0], flist_te, vert_te, surf, length, lengthh); tot_surf+=surf;
@@ -37,8 +38,8 @@ vol+=(surf*face_te[i0].dist)/3.0;}
                              }
 }
 
-void surface(face& face0, vector<flist>& flist_te, vector<vert>& vert_te, double& surf, 
-double* length, double* lengthh){
+void surface(const face& face0, const vector<flist>& flist_te, const vector<vert>& vert_te, double& surf, 
+const double* length, const double* lengthh){
 surf=0.0; int link_index=flist_te[face0.fptr].link, m=0;
 double pos0[4], pos1[4], tempr[4];
 while( flist_te[link_index].link != face0.fptr) {
@@ -55,7 +56,7 @@ while( flist_te[link_index].link != face0.fptr) {
 
 
 //synthesis the process
-void bisectplane( double* pos0, double* pos1, double* length, double* lengthh, 
+void bisectplane( const double* pos0, const double* pos1, const double* length, const double* lengthh, 
 vector<vert>& vert_te, vector<edge>& edge_te, vector<face>& face_te , 
 vector<flist>& flist_te, int& elast, int& vlast, int& flast,int& flistlast, bool& near)
 { int vlast0=vlast, changed_face=0, m; near=false;
@@ -87,7 +88,7 @@ for(int i0=0; i0<flast; i0++){if (face_te[i0].stat == 2) face_te[i0].stat=3; }
 }
 
 //judge_vertex and status
-void judge_stat(double* pos0, double* pos1, double* length, double* lengthh, 
+void judge_stat(const double* pos0, const double* pos1, const double* length, const double* lengthh, 
 vector<vert>& vert_te, vector<edge>& edge_te, vector<face>& face_te, 
 vector<flist>& flist_te, int vlast, int flast){
 bool vert_outside; int fs=0, l1;
@@ -115,8 +116,8 @@ if(fs<1) face_te[i0].stat=1;
 }
 
 
-void judge_vertex( double* pos0, double* pos1,double* pos2, 
-double* length, double* lengthh, bool& vert_outside){
+void judge_vertex( const double* pos0, const double* pos1, const double* pos2, 
+const double* length, const double* lengthh, bool& vert_outside){
 double distan[3], tempr, plu[3], temp0, temp1;
 vert_outside=false; for(int i=0; i<3; i++)
 {distan[i]=pos1[i]-pos0[i]; }
@@ -130,7 +131,7 @@ if ( tempr > ((temp1-temp0)/(2.0)) ) vert_outside=true;
 
 
 //determing the new vertex pos and status
-void find_new_vert(double* pos0, double* pos1, double* length, double* lengthh, 
+void find_new_vert(const double* pos0, const double* pos1, const double* length, const double* lengthh, 
 vector<vert>& vert_te, vector<edge>& edge_te, int elast, int& vlast, int& changed_face){
 double new_vertex[3], a, pos[4]; int i2, change; vert vert1; 
 for(int i0=0; i0<elast; i0++){
@@ -160,8 +161,8 @@ for(int i0=0; i0<elast; i0++){
 
 
 
-void new_vertex_coeff(double* pos0, double* pos1, double* pos2, double* pos3, 
-double* length, double* lengthh, double& a){
+void new_vertex_coeff(const double* pos0, const double* pos1, double* pos2, double* pos3, 
+const double* length, const double* lengthh, double& a){
 double distan[3], tempr, shift1[3], shift2[3];
 for(int i=0; i<3;i++) { distan[i]=pos1[i]-pos0[i]; shift1[i]=pos3[i]-pos2[i];} 
 calc_distan(length, lengthh, distan, tempr);

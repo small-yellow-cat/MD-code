@@ -62,7 +62,7 @@ infile_dump.ignore(100, '\n');
 
 //void intialize the voronoi cell
 void init_voronoi(vector<vert>& vert_te, vector<edge>& edge_te, 
-vector<face>& face_te, vector<flist>& flist_te, double* origin, int vlast, int elast,
+vector<face>& face_te, vector<flist>& flist_te, const double* origin, int vlast, int elast,
 int flast, int flistlast, double rangelim){
 //default setting
 int list_v_e[100]={1, 3, 6, 1, 2, 5, 2, 3, 4, 4, 5, 6};
@@ -113,7 +113,7 @@ flist_te[m0-1].link=face_te[i].fptr;
 
 
 void voronoi_cell(double* length, double* lengthh, double** pos_o, 
-int index_origin, int* order, int num_order, double& vol, double& tot_surf){
+int index_origin, const int* order, int num_order, double& vol, double& tot_surf){
 double rangelim=31.0, second[3];
 int elast=6, vlast=4,  flast=4, flistlast=12;
 double origin[3]; for(int i=0; i<3;i++) origin[i]=pos_o[index_origin][i];

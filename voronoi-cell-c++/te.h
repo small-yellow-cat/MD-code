@@ -5,6 +5,7 @@
 # include <algorithm>
 # include <sstream>
 #include "cut.h"
+#include <omp.h>
 using namespace std;
 
 
@@ -20,12 +21,12 @@ double* lengthh, double** pos_o, double** pos_h);
 
 //void intialize the voronoi cell
 void init_voronoi(vector<vert>& vert_te, vector<edge>& edge_te, 
-vector<face>& face_te, vector<flist>& flist_te, double* origin, int vlast=4, int elast=6,
+vector<face>& face_te, vector<flist>& flist_te, const double* origin, int vlast=4, int elast=6,
 int flast=4, int flistlast=12, double ranglim=31.0);
 
 //synthesis
 void voronoi_cell
-(double* length, double* lengthh, double** pos_o, int index_origin, int* order, int num_order, 
+(double* length, double* lengthh, double** pos_o, int index_origin, const int* order, int num_order, 
  double& vol, double& tot_surf);
 
 
